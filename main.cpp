@@ -8,7 +8,7 @@ using namespace std;
 /** Global Constants **/
 const string TRACE = "trace";
 const string SHOW_STATISTICS = "stats";
-const string ALGORITHMS[9] = {"", "FCFS", "RR-", "SPN", "SRT", "HRRN", "FB-1", "FB-2i", "AGING"};
+const string ALGORITHMS[9] = {"", " FCFS", "RR-", "SPN", "SRT", "HRRN", "FB-1", "FB-2i", "AGING"};
 
 bool sortByServiceTime(const tuple<string, int, int> &a, const tuple<string, int, int> &b)
 {
@@ -183,14 +183,14 @@ void shortestRemainingTime()
     int j = 0;
     for (int i = 0; i < last_instant; i++)
     {
-        while(j<process_count &&getArrivalTime(processes[j]) == i){
+        while(j<process_count &&getArrivalTime(processes[j])== i){
             pq.push(make_pair(getServiceTime(processes[j]), j));
             j++;
         }
         if (!pq.empty())
         {
-            int processIndex = pq.top().second;
             int remainingTime = pq.top().first;
+      	    int processIndex = pq.top().second;
             pq.pop();
             int serviceTime = getServiceTime(processes[processIndex]);
             int arrivalTime = getArrivalTime(processes[processIndex]);
@@ -204,7 +204,7 @@ void shortestRemainingTime()
             }
             else
             {
-                pq.push(make_pair(remainingTime - 1, processIndex));
+                pq.push({(remainingTime - 1, processIndex)});
             }
         }
     }
@@ -236,7 +236,7 @@ void highestResponseRatioNext()
         // Sort present processes by highest to lowest response ratio
         sort(all(present_processes), descendingly_by_response_ratio);
 
-        if (!present_processes.empty())
+        if (present_processes.size()!=0)
         {
             int process_index = processToIndex[get<0>(present_processes[0])];
             while(current_instant<last_instant && get<2>(present_processes[0]) != getServiceTime(processes[process_index])){
@@ -260,7 +260,7 @@ void feedbackQ1()
     unordered_map<int,int>remainingServiceTime; //map from process index to the remaining service time
     int j=0;
     if(getArrivalTime(processes[0])==0){
-        pq.push(make_pair(0,j));
+        pq.push({(0,j)});
         remainingServiceTime[j]=getServiceTime(processes[j]);
         j++;
     }
@@ -272,7 +272,7 @@ void feedbackQ1()
             int serviceTime = getServiceTime(processes[processIndex]);
             pq.pop();
             while(j<process_count && getArrivalTime(processes[j])==time+1){
-                    pq.push(make_pair(0,j));
+                    pq.push({(0,j)});
                     remainingServiceTime[j]=getServiceTime(processes[j]);
                     j++;
             }
@@ -284,9 +284,9 @@ void feedbackQ1()
                 normTurn[processIndex] = (turnAroundTime[processIndex] * 1.0 / serviceTime);
             }else{
                 if(pq.size()>=1)
-                    pq.push(make_pair(priorityLevel+1,processIndex));
+                    pq.push({(priorityLevel+1,processIndex)});
                 else
-                    pq.push(make_pair(priorityLevel,processIndex));
+                    pq.push({(priorityLevel,processIndex)});
             }
         }
         while(j<process_count && getArrivalTime(processes[j])==time+1){
